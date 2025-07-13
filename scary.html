@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>火柴人舞蹈秀</title>
+    <title>恐怖火柴人 - 微信专版</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: manipulation;
         }
         
         body {
@@ -263,6 +264,48 @@
             box-shadow: 0 0 30px rgba(255, 0, 0, 0.9);
         }
         
+        /* 音频提示 */
+        .audio-alert {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #ffcc00;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: none;
+        }
+        
+        .activate-audio {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+        }
+        
+        .activate-button {
+            padding: 15px 30px;
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
+            margin-top: 20px;
+        }
+        
         /* 动画定义 */
         @keyframes armLeft {
             0% { transform: rotate(-20deg); }
@@ -308,9 +351,26 @@
             0%, 50%, 100% { opacity: 1; }
             25%, 75% { opacity: 0.3; }
         }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+    <!-- 音频激活提示层 -->
+    <div class="activate-audio" id="activateOverlay">
+        <div class="title" style="text-align: center; max-width: 80%;">
+            为了获得完整恐怖体验<br>请点击下方按钮激活音效
+        </div>
+        <button class="activate-button" id="activateButton">🔊 激活音效</button>
+        <div style="margin-top: 20px; color: #aaa; font-size: 14px;">
+            (微信浏览器需要用户交互才能播放声音)
+        </div>
+    </div>
+    
     <div class="container">
         <!-- 第一阶段：火柴人跳舞 -->
         <div class="stage">
@@ -351,36 +411,78 @@
             <div class="message">你已经唤醒了我...<br>现在，你将永远无法离开...</div>
             <button class="run-button" onclick="tryToEscape()">快 逃 跑！</button>
         </div>
+        
+        <!-- 音频提示 -->
+        <div class="audio-alert" id="audioAlert">
+            如果听不到声音，请点击屏幕任意位置激活音效
+        </div>
     </div>
 
-    <!-- 音效元素 -->
+    <!-- Base64编码的音频文件 -->
     <audio id="scream" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-horror-scream-2836.mp3" type="audio/mpeg">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
     </audio>
+    
     <audio id="heartbeat" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-fast-heartbeat-757.mp3" type="audio/mpeg">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
     </audio>
     
     <script>
-        // 第一阶段：展示火柴人跳舞
-        setTimeout(() => {
-            document.querySelector('.countdown').style.opacity = '1';
-        }, 3000);
+        // 初始化变量
+        let audioActivated = false;
+        const activateOverlay = document.getElementById('activateOverlay');
+        const activateButton = document.getElementById('activateButton');
+        const audioAlert = document.getElementById('audioAlert');
+        const screamAudio = document.getElementById('scream');
+        const heartbeatAudio = document.getElementById('heartbeat');
         
-        // 第二阶段：恐怖效果（5秒后触发）
-        setTimeout(() => {
+        // 激活音频
+        activateButton.addEventListener('click', function() {
+            // 预热音频
+            screamAudio.volume = 0.5;
+            screamAudio.play().then(() => {
+                screamAudio.pause();
+                screamAudio.currentTime = 0;
+            }).catch(e => console.log('音频预热'));
+            
+            heartbeatAudio.volume = 0.3;
+            heartbeatAudio.play().then(() => {
+                heartbeatAudio.pause();
+                heartbeatAudio.currentTime = 0;
+                audioActivated = true;
+                activateOverlay.style.display = 'none';
+                
+                // 开始倒计时
+                setTimeout(() => {
+                    document.querySelector('.countdown').style.opacity = '1';
+                }, 1000);
+                
+                // 5秒后开始恐怖效果
+                setTimeout(startHorror, 5000);
+            }).catch(e => {
+                console.log('音频激活失败');
+                audioAlert.style.display = 'block';
+            });
+        });
+        
+        // 开始恐怖效果
+        function startHorror() {
             // 显示恐怖内容
             document.querySelector('.horror-section').style.display = 'flex';
             
             // 播放恐怖音效
-            document.getElementById('scream').play().catch(e => console.log('需要用户交互才能播放音频'));
-            document.getElementById('heartbeat').play().catch(e => console.log('需要用户交互才能播放音频'));
+            if(audioActivated) {
+                screamAudio.play();
+                heartbeatAudio.play();
+            } else {
+                audioAlert.style.display = 'block';
+            }
             
             // 添加闪烁效果
             setInterval(() => {
                 document.body.style.backgroundColor = Math.random() > 0.5 ? '#300' : '#000';
             }, 300);
-        }, 8000);
+        }
         
         // 尝试逃跑功能
         function tryToEscape() {
@@ -409,25 +511,19 @@
             }, 500);
         }
         
-        // 微信中自动播放音频的解决方案
-        document.addEventListener('touchstart', function initAudio() {
-            // 预热音频
-            const scream = document.getElementById('scream');
-            scream.volume = 0.5;
-            scream.play().then(() => {
-                scream.pause();
-                scream.currentTime = 0;
-            }).catch(e => console.log('音频预热'));
+        // 全局触摸事件激活音频
+        document.addEventListener('touchstart', function() {
+            if(!audioActivated) return;
             
-            const heartbeat = document.getElementById('heartbeat');
-            heartbeat.volume = 0.3;
-            heartbeat.play().then(() => {
-                heartbeat.pause();
-                heartbeat.currentTime = 0;
-            }).catch(e => console.log('音频预热'));
-            
-            // 移除事件监听器
-            document.removeEventListener('touchstart', initAudio);
+            // 尝试播放音频
+            screamAudio.play().catch(e => {
+                console.log('播放失败');
+                audioAlert.style.display = 'block';
+            });
+            heartbeatAudio.play().catch(e => {
+                console.log('播放失败');
+                audioAlert.style.display = 'block';
+            });
         });
     </script>
 </body>
