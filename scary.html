@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>火柴人舞蹈秀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            cursor: default;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 第一阶段 - 舞蹈阶段 */
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .dance-floor {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(253, 187, 45, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .stickman {
+            position: relative;
+            width: 100px;
+            height: 150px;
+        }
+        
+        .head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        
+        .body {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 60px;
+            background: #fff;
+        }
+        
+        .arm {
+            position: absolute;
+            width: 50px;
+            height: 6px;
+            background: #fff;
+            top: 50px;
+        }
+        
+        .arm.left {
+            left: -20px;
+            transform-origin: right center;
+            animation: armLeft 1s infinite alternate;
+        }
+        
+        .arm.right {
+            right: -20px;
+            transform-origin: left center;
+            animation: armRight 1s infinite alternate-reverse;
+        }
+        
+        .leg {
+            position: absolute;
+            width: 6px;
+            height: 60px;
+            background: #fff;
+            top: 100px;
+        }
+        
+        .leg.left {
+            left: 45%;
+            transform-origin: top center;
+            animation: legLeft 0.8s infinite alternate;
+        }
+        
+        .leg.right {
+            right: 45%;
+            transform-origin: top center;
+            animation: legRight 0.8s infinite alternate-reverse;
+        }
+        
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 0 0 10px #fdbb2d;
+        }
+        
+        .countdown {
+            font-size: 18px;
+            margin-top: 15px;
+            color: #ffcc00;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        
+        /* 第二阶段 - 恐怖阶段 */
+        .horror-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .blood-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="rgba(150,0,0,0.2)" d="M20,30 Q40,5 60,30 Q80,55 50,85 Q20,55 20,30 Z"/></svg>');
+            background-size: 300px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .scary-face {
+            width: 200px;
+            height: 200px;
+            background: #222;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            animation: shake 0.5s infinite;
+        }
+        
+        .eyes {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .eye {
+            width: 40px;
+            height: 60px;
+            background: #ff0000;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pupil {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            top: 20px;
+            left: 10px;
+            animation: look 3s infinite;
+        }
+        
+        .mouth {
+            position: absolute;
+            bottom: 50px;
+            width: 120px;
+            height: 40px;
+            background: #ff0000;
+            border-radius: 0 0 60px 60px;
+            animation: scream 2s infinite alternate;
+        }
+        
+        .teeth {
+            position: absolute;
+            top: -10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tooth {
+            width: 10px;
+            height: 20px;
+            background: #fff;
+        }
+        
+        .warning {
+            font-size: 28px;
+            color: #ff0000;
+            text-align: center;
+            margin-top: 30px;
+            text-shadow: 0 0 10px #ff0000;
+            animation: blink 1s infinite;
+        }
+        
+        .message {
+            font-size: 18px;
+            color: #ff6666;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .run-button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(to right, #ff0000, #8b0000);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            transition: all 0.3s;
+        }
+        
+        .run-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.9);
+        }
+        
+        /* 动画定义 */
+        @keyframes armLeft {
+            0% { transform: rotate(-20deg); }
+            100% { transform: rotate(40deg); }
+        }
+        
+        @keyframes armRight {
+            0% { transform: rotate(20deg); }
+            100% { transform: rotate(-40deg); }
+        }
+        
+        @keyframes legLeft {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(25deg); }
+        }
+        
+        @keyframes legRight {
+            0% { transform: rotate(15deg); }
+            100% { transform: rotate(-25deg); }
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(0); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes look {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(15px, 10px); }
+            50% { transform: translate(0, 20px); }
+            75% { transform: translate(-15px, 10px); }
+        }
+        
+        @keyframes scream {
+            0% { height: 40px; }
+            100% { height: 70px; }
+        }
+        
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 第一阶段：火柴人跳舞 -->
+        <div class="stage">
+            <div class="dance-floor">
+                <div class="stickman">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="arm left"></div>
+                    <div class="arm right"></div>
+                    <div class="leg left"></div>
+                    <div class="leg right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="title">火柴人舞蹈秀</div>
+        <div class="countdown">小心！有东西正在接近...</div>
+        
+        <!-- 第二阶段：恐怖画面 -->
+        <div class="horror-section">
+            <div class="blood-overlay"></div>
+            <div class="scary-face">
+                <div class="eyes">
+                    <div class="eye"><div class="pupil"></div></div>
+                    <div class="eye"><div class="pupil"></div></div>
+                </div>
+                <div class="mouth">
+                    <div class="teeth">
+                        <div class="tooth"></div>
+                        <div class="tooth"></div>
+                        <div class="tooth"></div>
+                        <div class="tooth"></div>
+                        <div class="tooth"></div>
+                        <div class="tooth"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="warning">不要看我的眼睛！</div>
+            <div class="message">你已经唤醒了我...<br>现在，你将永远无法离开...</div>
+            <button class="run-button" onclick="tryToEscape()">快 逃 跑！</button>
+        </div>
+    </div>
+
+    <!-- 音效元素 -->
+    <audio id="scream" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-horror-scream-2836.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="heartbeat" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-fast-heartbeat-757.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // 第一阶段：展示火柴人跳舞
+        setTimeout(() => {
+            document.querySelector('.countdown').style.opacity = '1';
+        }, 3000);
+        
+        // 第二阶段：恐怖效果（5秒后触发）
+        setTimeout(() => {
+            // 显示恐怖内容
+            document.querySelector('.horror-section').style.display = 'flex';
+            
+            // 播放恐怖音效
+            document.getElementById('scream').play().catch(e => console.log('需要用户交互才能播放音频'));
+            document.getElementById('heartbeat').play().catch(e => console.log('需要用户交互才能播放音频'));
+            
+            // 添加闪烁效果
+            setInterval(() => {
+                document.body.style.backgroundColor = Math.random() > 0.5 ? '#300' : '#000';
+            }, 300);
+        }, 8000);
+        
+        // 尝试逃跑功能
+        function tryToEscape() {
+            const button = document.querySelector('.run-button');
+            button.textContent = "太迟了！逃不掉的！";
+            button.style.background = 'linear-gradient(to right, #333, #000)';
+            button.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.7)';
+            
+            // 移动按钮
+            let moveCount = 0;
+            const moveInterval = setInterval(() => {
+                moveCount++;
+                const x = Math.random() * 80;
+                const y = Math.random() * 80;
+                button.style.position = 'absolute';
+                button.style.left = `${x}%`;
+                button.style.top = `${y}%`;
+                
+                if (moveCount > 15) {
+                    clearInterval(moveInterval);
+                    button.style.display = 'none';
+                    document.querySelector('.message').textContent = "游戏结束...我找到你了...";
+                    document.querySelector('.message').style.fontSize = '24px';
+                    document.querySelector('.message').style.color = '#f00';
+                }
+            }, 500);
+        }
+        
+        // 微信中自动播放音频的解决方案
+        document.addEventListener('touchstart', function initAudio() {
+            // 预热音频
+            const scream = document.getElementById('scream');
+            scream.volume = 0.5;
+            scream.play().then(() => {
+                scream.pause();
+                scream.currentTime = 0;
+            }).catch(e => console.log('音频预热'));
+            
+            const heartbeat = document.getElementById('heartbeat');
+            heartbeat.volume = 0.3;
+            heartbeat.play().then(() => {
+                heartbeat.pause();
+                heartbeat.currentTime = 0;
+            }).catch(e => console.log('音频预热'));
+            
+            // 移除事件监听器
+            document.removeEventListener('touchstart', initAudio);
+        });
+    </script>
+</body>
+</html>
